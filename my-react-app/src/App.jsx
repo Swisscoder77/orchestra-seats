@@ -3,15 +3,15 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import './App.css';
 
-function darkenColor(color, amount = 0.5) {
+function darkenColor(color, amount = 0.3) {
   // Remove # if present
   color = color.replace('#', '');
   // Parse r, g, b values
   const num = parseInt(color, 16);
   const amt = Math.round(2.55 * amount * 100);
-  const R = (num >> 16) + amt;
-  const G = (num >> 8 & 0x00FF) + amt;
-  const B = (num & 0x0000FF) + amt;
+  const R = (num >> 16) - amt;
+  const G = (num >> 8 & 0x00FF) - amt;
+  const B = (num & 0x0000FF) - amt;
   return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
     (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
     (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
@@ -133,7 +133,7 @@ function App() {
 
   return (
     <div className="app">
-      <h1>Orchester-Sitzplan</h1>
+      <h1>Besatzung</h1>
       <div className="main-layout">
         <div className="sidebar">
           <div className="controls">
@@ -142,7 +142,7 @@ function App() {
               <input
                 type="number"
                 min="1"
-                max="10"
+                max="7"
                 value={numRows}
                 onChange={(e) => handleNumRowsChange(e.target.value)}
               />
@@ -165,6 +165,7 @@ function App() {
                 placeholder="Gruppenname"
                 value={newGroupName}
                 onChange={(e) => setNewGroupName(e.target.value)}
+                maxLength={15}
               />
               <input
                 type="color"
@@ -269,7 +270,7 @@ function App() {
                 </div>
               );
             })}
-            <div className="conductor" style={{ width: seatSize * 1.2, height: seatSize * 1.2, fontSize: seatSize * 0.5 }}>D</div>
+            <div className="conductor" style={{ width: seatSize * 2, height: seatSize * 1.7, fontSize: seatSize * 0.8 }}>D</div>
           </div>
           <div className="legend">
             <h3>Legende</h3>

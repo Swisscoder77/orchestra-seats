@@ -179,8 +179,9 @@ button:hover {
   border: 2px solid #000;
 }
 
-.seat-svg:hover circle {
-  stroke-width: 2;
+.legend-group span {
+  font-weight: bold;
+  color: #333;
 }
 
 .conductor {
