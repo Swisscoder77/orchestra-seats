@@ -431,22 +431,11 @@ function App() {
                       <td key={index}>{index + 1}</td>
                     ))}
                   </tr>
-                  <tr>
-                    <td>Gesamt Stühle:</td>
-                    {seatsPerRow.slice(0, numRows).map((seats, index) => (
-                      <td key={index}>{seats}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td>Gelöscht:</td>
-                    {deletedSeatsPerRow.map((deleted, index) => (
-                      <td key={index} style={{ color: '#ff0000' }}>{deleted}</td>
-                    ))}
-                  </tr>
+
                   <tr style={{ fontWeight: 'bold' }}>
-                    <td>Aktive Stühle:</td>
+                    <td>Anzahl Stühle:</td>
                     {activeSeatsPerRow.map((active, index) => (
-                      <td key={index} style={{ color: '#009900' }}>{active}</td>
+                      <td key={index} >{active}</td>
                     ))}
                   </tr>
                 </tbody>
