@@ -26,7 +26,7 @@ function App() {
   const layoutRef = useRef();
 
   const handleNumRowsChange = (value) => {
-    const newNum = Math.max(1, Math.min(10, parseInt(value) || 1));
+    const newNum = Math.max(1, Math.min(5, parseInt(value) || 1));
     setNumRows(newNum);
     setSeatsPerRow(prev => {
       const newSeats = [...prev];
@@ -44,8 +44,42 @@ function App() {
     setSeatsPerRow(newSeats);
   };
 
-  const predefinedColors = ['#E74C3C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#1ABC9C', '#E67E22', '#34495E', '#F1C40F', '#E91E63'];
-
+  const predefinedColors = [
+  '#E74C3C', // Rot
+  '#3498DB', // Blau
+  '#2ECC71', // Grün
+  '#F39C12', // Orange
+  '#9B59B6', // Violett
+  '#1ABC9C', // Türkis
+  '#E67E22', // Dunkelorange
+  '#34495E', // Dunkelblau
+  '#F1C40F', // Goldgelb
+  '#E91E63', // Pink
+  
+  // Neue Farben:
+  '#16A085',   // Petrol
+  '#8E44AD',   // Dunkellila
+  '#2C3E50',   // Nachtblau
+  '#D35400',   // Kürbisfarben
+  '#C0392B',   // Kardinalrot
+  '#27AE60',   // Smaragdgrün
+  '#2980B9',   // Himmelblau
+  '#F7DC6F',   // Hellgelb
+  '#A569BD',   // Lavendel
+  '#45B39D',   // Aquamarin
+  
+  // Zusätzliche helle/satte Farben:
+  '#E84393',   // Pink
+  '#00CEC9',   // Hell-Türkis
+  '#FD79A8',   // Rosa
+  '#6C5CE7',   // Lila-Blau
+  '#FF7675',   // Koralle
+  '#74B9FF',   // Lichtblau
+  '#55EFC4',   // Mint
+  '#FFEAA7',   // Creme
+  '#A29BFE',   // Pastell-Lila
+  '#DFE6E9'    // Hellgrau
+];
   useEffect(() => {
     const usedColors = groups.filter(g => g.name !== "Ausblenden").map(g => g.color);
     const availableColors = predefinedColors.filter(c => !usedColors.includes(c));
@@ -485,7 +519,7 @@ const exportToPDF = () => {
               })}
             </div>
             <button onClick={exportToPDF} style={{ backgroundColor: '#4CAF50', color: 'white', padding: '10px 15px' }}>
-              PDF Export (Vektorgrafiken)
+              PDF Export 
             </button>
           </div>
         </div>
