@@ -1,12 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import './App.css';
 
 function darkenColor(color, amount = 0.3) {
-  // Remove # if present
   color = color.replace('#', '');
-  // Parse r, g, b values
   const num = parseInt(color, 16);
   const amt = Math.round(2.55 * amount * 100);
   const R = (num >> 16) - amt;
@@ -50,14 +47,14 @@ function App() {
   const predefinedColors = ['#E74C3C', '#3498DB', '#2ECC71', '#F39C12', '#9B59B6', '#1ABC9C', '#E67E22', '#34495E', '#F1C40F', '#E91E63'];
 
   useEffect(() => {
-    const usedColors = groups.filter(g => g.name !== "Löschen").map(g => g.color);
+    const usedColors = groups.filter(g => g.name !== "Ausblenden").map(g => g.color);
     const availableColors = predefinedColors.filter(c => !usedColors.includes(c));
     const randomColor = availableColors.length > 0 ? availableColors[Math.floor(Math.random() * availableColors.length)] : predefinedColors[Math.floor(Math.random() * predefinedColors.length)];
     setNewGroupColor(randomColor);
   }, [groups]);
 
   const addGroup = () => {
-    if (newGroupName.trim() && newGroupName.trim() !== "Löschen") {
+    if (newGroupName.trim() && newGroupName.trim() !== "Ausblenden") {
       setGroups([...groups, { name: newGroupName, color: newGroupColor, seats: new Set() }]);
       setNewGroupName('');
       setNewGroupColor('#FF6B6B');
@@ -71,14 +68,14 @@ function App() {
   };
 
   const startEditGroup = (index) => {
-    if (groups[index].name !== "Löschen") {
+    if (groups[index].name !== "Ausblenden") {
       setEditingGroup(index);
       setEditName(groups[index].name);
     }
   };
 
   const saveEditGroup = () => {
-    if (editName.trim() && editName.trim() !== "Löschen") {
+    if (editName.trim() && editName.trim() !== "Ausblenden") {
       setGroups(groups.map((g, i) => i === editingGroup ? { ...g, name: editName } : g));
     }
     setEditingGroup(null);
@@ -91,26 +88,21 @@ function App() {
     const seatId = `${rowIndex}-${seatIndex}`;
     const selectedGroupData = groups[selectedGroup];
     
-    // Wenn die Lösch-Gruppe ausgewählt ist
-    if (selectedGroupData.name === "Löschen") {
-      // Entferne den Sitz aus allen FARB-Gruppen und füge ihn zur Lösch-Gruppe hinzu
+    if (selectedGroupData.name === "Ausblenden") {
       setGroups(groups.map(g => {
         const newSeats = new Set(g.seats);
-        if (g.name === "Löschen") {
-          // Zur Lösch-Gruppe hinzufügen
+        if (g.name === "Ausblenden") {
           if (newSeats.has(seatId)) {
-            newSeats.delete(seatId); // Entfernen, wenn schon drin
+            newSeats.delete(seatId);
           } else {
-            newSeats.add(seatId); // Hinzufügen, wenn nicht drin
+            newSeats.add(seatId);
           }
         } else {
-          // Aus allen anderen Gruppen entfernen
           newSeats.delete(seatId);
         }
         return { ...g, seats: newSeats };
       }));
     } else {
-      // Normales Verhalten für FARB-Gruppen
       setGroups(groups.map((g, i) => {
         const newSeats = new Set(g.seats);
         if (i === selectedGroup) {
@@ -118,8 +110,7 @@ function App() {
             newSeats.delete(seatId);
           } else {
             newSeats.add(seatId);
-            // Wenn zu einer Farb-Gruppe hinzugefügt, aus Lösch-Gruppe entfernen
-            const deleteGroup = groups.find(g => g.name === "Löschen");
+            const deleteGroup = groups.find(g => g.name === "Ausblenden");
             if (deleteGroup) {
               const deleteIndex = groups.indexOf(deleteGroup);
               if (deleteIndex !== -1 && deleteIndex !== selectedGroup) {
@@ -129,8 +120,7 @@ function App() {
               }
             }
           }
-        } else if (g.name !== "Löschen") {
-          // Remove from other color groups (but not from delete group)
+        } else if (g.name !== "Ausblenden") {
           newSeats.delete(seatId);
         }
         return { ...g, seats: newSeats };
@@ -143,38 +133,210 @@ function App() {
   const minRadius = 50;
   const seatSize = Math.max(20, 40 - Math.max(0, numRows - 4) * 2);
 
-  const exportToPDF = async () => {
-    const element = layoutRef.current;
-    const canvas = await html2canvas(element);
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF('landscape'); // landscape for lengthwise printing
-    const imgWidth = 297; // A4 landscape width in mm
-    const pageHeight = 210; // A4 landscape height in mm
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    let heightLeft = imgHeight;
-    let position = 0;
+const exportToPDF = () => {
+  const pdf = new jsPDF('landscape', 'mm', 'a4');
+  const pageWidth = 297;
+  const pageHeight = 210;
+  const margin = 15;
+  const contentWidth = pageWidth - 2 * margin;
+  
+  // Berechne Sitzplan Skalierung
+  const stageCenterX = pageWidth / 2;
+  const stageCenterY = pageHeight / 2 + 40;
+  const pdfStageSize = contentWidth;
+  const pdfScale = pdfStageSize / stageSize;
+  const pdfSeatSize = seatSize * pdfScale;
+  
+  // Zeichne Halbkreis für Sitzreihen
+  pdf.setDrawColor(200, 200, 200);
+  pdf.setLineWidth(0.2);
+  const pdfMaxRadius = (maxRadius * pdfScale);
+  const pdfMinRadius = (minRadius * pdfScale);
+  
+  pdf.setDrawColor(255, 255, 255)
+  for (let i = 0; i < numRows; i++) {
+    const step = (pdfMaxRadius - pdfMinRadius) / numRows;
+    const radius = pdfMinRadius + (i + 1) * step;
+    pdf.circle(stageCenterX, stageCenterY, radius, 'S');
+  }
+  pdf.setDrawColor(200, 200, 200);
 
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-
-    while (heightLeft >= 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+  // Zeichne Sitze als Vektoren
+  Array.from({ length: numRows }).forEach((_, rowIndex) => {
+    const seats = seatsPerRow[rowIndex];
+    const step = (maxRadius - minRadius) / numRows;
+    const radius = minRadius + (rowIndex + 1) * step;
+    const angles = [];
+    
+    for (let i = 0; i < seats; i++) {
+      angles.push(-90 + (180 / (seats - 1 || 1)) * i);
     }
+    
+    angles.forEach((angle, seatIndex) => {
+      const rad = (angle * Math.PI) / 180;
+      const x = radius * Math.sin(rad) * pdfScale;
+      const y = -radius * Math.cos(rad) * pdfScale;
+      
+      const seatId = `${rowIndex}-${seatIndex}`;
+      const groupForSeat = groups.find(g => g.seats.has(seatId));
+      const isDeleteGroupSeat = groupForSeat?.name === "Ausblenden";
+      const isColorGroupSeat = groupForSeat && groupForSeat.name !== "Ausblenden";
+      
+      // Bestimme Farben
+      let fillColor = isDeleteGroupSeat ? [255, 255, 255] : 
+                      isColorGroupSeat ? hexToRgb(groupForSeat.color) : 
+                      [204, 204, 204];
+      
+      let borderColor = isDeleteGroupSeat ? [255, 255, 255] :
+                        isColorGroupSeat ? hexToRgb(darkenColor(groupForSeat.color)) :
+                        [0, 0, 0];
+      
+      // Zeichne Sitz
+      pdf.setFillColor(fillColor[0], fillColor[1], fillColor[2]);
+      pdf.setDrawColor(borderColor[0], borderColor[1], borderColor[2]);
+      pdf.circle(stageCenterX + x, stageCenterY + y, pdfSeatSize/2, 'FD');
+      
+      // Sitznummer oder Gruppencode
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(pdfSeatSize);
+      const label = isDeleteGroupSeat ? "" : 
+                    groupForSeat ? groupForSeat.name.substring(0, 3) : 
+                    (seatIndex + 1).toString();
+      
+      if (label) {
+        pdf.text(label, stageCenterX + x, stageCenterY + y, { align: 'center', baseline: 'middle' });
+      }
+    });
+  });
+  
+  // ZEICHNE DIRIGENTENPLATZ - KORRIGIERT
+  pdf.setFillColor(100, 100, 100);
+  pdf.setDrawColor(50, 50, 50);
+  
+  // Position für Dirigenten - unter den Sitzreihen
+  const conductorWidth = pdfSeatSize * 2;
+  const conductorHeight = pdfSeatSize * 1.7;
+  const conductorX = pageWidth / 2;
+  const conductorY = pageHeight/2 + 26; // 10mm Abstand unter den Sitzen
+  
+  // Rechteck für Dirigentenplatz
+  pdf.rect(
+    conductorX - conductorWidth/2, 
+    conductorY, 
+    conductorWidth, 
+    conductorHeight, 
+    'FD'
+  );
+  
+  // "D" für Dirigent
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(pdfSeatSize * 3);
+  pdf.text('D', conductorX, conductorY + conductorHeight/2, { 
+    align: 'center', 
+    baseline: 'middle' 
+  });
+  
+    
+    // Legende rechts
+    let legendX = margin;
+    let legendY = pageHeight*0.8 + 16;
+    
+    // Stühle pro Reihe Tabelle
+    pdf.setFontSize(12);
+    pdf.setTextColor(60, 60, 60);
+    pdf.text('Stühle pro Reihe:', legendX, legendY);
+    pdf.line(legendX, legendY -8, pageWidth - margin, legendY -8);    
+    legendY += 8;
+    
+    const tableColWidth = 15;
+    const activeSeats = getActiveSeatsPerRow();
+    
+    // Tabellenkopf
+    pdf.setFontSize(10);
+    pdf.setTextColor(100, 100, 100);
+    pdf.text('Reihe', legendX, legendY);
+    for (let i = 0; i < numRows; i++) {
+      pdf.text((i + 1).toString(), legendX + 20 + i * tableColWidth, legendY);
+    }
+    legendY += 6;
+    
+    // Aktive Stühle Zeile
+    pdf.setFontSize(10);
+    pdf.setTextColor(100, 100, 100);
+    pdf.text('Aktive', legendX, legendY);
+    activeSeats.forEach((seats, i) => {
+      pdf.text(seats.toString(), legendX + 20 + i * tableColWidth, legendY);
+    });
+    legendX += 90;
+    legendY -= 16;
+    
+    // Farb-Gruppen
+    let groupsDrawn = 0;
+    let currentColumnX = legendX;
 
-    pdf.save('orchestra-seats.pdf');
+    otherGroups.forEach((group, index) => {
+      const color = hexToRgb(group.color);
+      
+      // Zeichne Gruppe an aktueller Position
+      drawLegendItem(pdf, currentColumnX, legendY, color, group.name, group.seats.size, false);
+      
+      groupsDrawn++;
+      legendY += 7; // Eine Zeile nach unten
+      
+      // Nach 3 Gruppen: Neue Spalte beginnen
+      if (groupsDrawn % 3 === 0) {
+        currentColumnX += 35; // 20mm nach rechts
+        legendY = legendY - 21; // Zurück zum Anfang (3 * 7mm = 21mm)
+      }
+    });
+
+    // Für weitere Elemente: legendX auf die nächste freie Position setzen
+    legendX = currentColumnX + 20;
+    // legendY auf die tiefste Position setzen
+    if (otherGroups.length % 3 !== 0) {
+      legendY = legendY + (3 - (otherGroups.length % 3)) * 7;
+    }
+        
+    // Fußzeile
+    pdf.setFontSize(8);
+    pdf.setTextColor(150, 150, 150);
+    //pdf.text('Generiert mit Besatzung App', pageWidth / 2, pageHeight - 5, { align: 'center' });
+    pdf.save('orchester-sitzplan.pdf');
   };
+
+  // Hilfsfunktion für Hex zu RGB
+  const hexToRgb = (hex) => {
+    hex = hex.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return [r, g, b];
+  };
+
+  // Hilfsfunktion für Legenden-Einträge
+  const drawLegendItem = (pdf, x, y, color, name, count, isDelete) => {
+    // Farbkästchen
+    pdf.setFillColor(color[0], color[1], color[2]);
+    pdf.setDrawColor(isDelete ? 150 : Math.max(0, color[0] - 50), 
+                    isDelete ? 150 : Math.max(0, color[1] - 50), 
+                    isDelete ? 150 : Math.max(0, color[2] - 50));
+    pdf.rect(x, y - 2, 4, 4, 'FD');
+    
+    // Text
+    pdf.setTextColor(isDelete ? 100 : 40, 
+                    isDelete ? 100 : 40, 
+                    isDelete ? 100 : 40);
+    pdf.setFont(undefined, isDelete ? 'italic' : 'normal');
+    pdf.text(`${name} (${count})`, x + 7, y);
+};
 
   // Funktion zum Zählen der gelöschten Sitze pro Reihe
   const getDeletedSeatsPerRow = () => {
-    const deleteGroupObj = groups.find(g => g.name === "Löschen");
+    const deleteGroupObj = groups.find(g => g.name === "Ausblenden");
     if (!deleteGroupObj) return new Array(numRows).fill(0);
     
     const deletedPerRow = new Array(numRows).fill(0);
     
-    // Zähle gelöschte Sitze pro Reihe
     deleteGroupObj.seats.forEach(seatId => {
       const [rowIndex] = seatId.split('-').map(Number);
       if (rowIndex >= 0 && rowIndex < numRows) {
@@ -197,8 +359,8 @@ function App() {
   };
 
   // Trenne die Lösch-Gruppe von anderen Gruppen
-  const deleteGroupObj = groups.find(g => g.name === "Löschen");
-  const otherGroups = groups.filter(g => g.name !== "Löschen");
+  const deleteGroupObj = groups.find(g => g.name === "Ausblenden");
+  const otherGroups = groups.filter(g => g.name !== "Ausblenden");
   const activeSeatsPerRow = getActiveSeatsPerRow();
   const deletedSeatsPerRow = getDeletedSeatsPerRow();
 
@@ -249,17 +411,9 @@ function App() {
               </button>
             </div>
             
-            {/* Lösch-Gruppe immer zuoberst */}
             {deleteGroupObj && (
               <div className={`group-item ${selectedGroup === groups.indexOf(deleteGroupObj) ? 'selected' : ''}`} style={{marginBottom: '15px', border: '2px solid #ccc'}}>
-                <span 
-                  style={{ 
-                    color: '#666',
-                    fontStyle: 'italic'
-                  }} 
-                >
-                  Löschen
-                </span>
+                <span style={{ color: '#666', fontStyle: 'italic' }}>Ausblenden</span>
                 <button onClick={() => {
                   const deleteIndex = groups.indexOf(deleteGroupObj);
                   setSelectedGroup(selectedGroup === deleteIndex ? null : deleteIndex);
@@ -272,11 +426,10 @@ function App() {
               </div>
             )}
             
-            {/* "Löschen" Gruppe Button nur wenn nicht existiert */}
             {!deleteGroupObj && (
               <button 
                 onClick={() => {
-                  setGroups([{ name: "Löschen", color: "#ffffff", seats: new Set() }, ...groups]);
+                  setGroups([{ name: "Ausblenden", color: "#ffffff", seats: new Set() }, ...groups]);
                 }}
                 style={{ 
                   marginBottom: '15px', 
@@ -285,11 +438,10 @@ function App() {
                   border: '1px solid #ccc'
                 }}
               >
-                + Löschen-Gruppe hinzufügen
+                + Ausblenden-Gruppe hinzufügen
               </button>
             )}
             
-            {/* Andere Gruppen */}
             <div className="groups-list">
               {otherGroups.map((group, index) => {
                 const originalIndex = groups.findIndex(g => g === group);
@@ -306,10 +458,7 @@ function App() {
                       />
                     ) : (
                       <>
-                        <span 
-                          style={{ color: group.color }} 
-                          onClick={() => startEditGroup(originalIndex)}
-                        >
+                        <span style={{ color: group.color }} onClick={() => startEditGroup(originalIndex)}>
                           {group.name}
                         </span>
                         <input
@@ -335,7 +484,9 @@ function App() {
                 );
               })}
             </div>
-            <button onClick={exportToPDF}>PDF Export</button>
+            <button onClick={exportToPDF} style={{ backgroundColor: '#4CAF50', color: 'white', padding: '10px 15px' }}>
+              PDF Export (Vektorgrafiken)
+            </button>
           </div>
         </div>
         <div className="layout" ref={layoutRef}>
@@ -349,7 +500,7 @@ function App() {
               const arcDistance = radius * deltaThetaRad;
               let rowSeatSize = seatSize;
               if (arcDistance <= seatSize) {
-                rowSeatSize = arcDistance * 0.9; // reduce to 90% of arc distance to avoid touching
+                rowSeatSize = arcDistance * 0.9;
               }
               const angles = [];
               for (let i = 0; i < seats; i++) {
@@ -364,24 +515,22 @@ function App() {
                     
                     const seatId = `${rowIndex}-${seatIndex}`;
                     const groupForSeat = groups.find(g => g.seats.has(seatId));
-                    const isDeleteGroupSelected = selectedGroup !== null && groups[selectedGroup]?.name === "Löschen";
-                    const isDeleteGroupSeat = groupForSeat?.name === "Löschen";
-                    const isColorGroupSeat = groupForSeat && groupForSeat.name !== "Löschen";
+                    const isDeleteGroupSelected = selectedGroup !== null && groups[selectedGroup]?.name === "Ausblenden";
+                    const isDeleteGroupSeat = groupForSeat?.name === "Ausblenden";
+                    const isColorGroupSeat = groupForSeat && groupForSeat.name !== "Ausblenden";
                     
-                    // Bestimme die Hintergrundfarbe
-                    let backgroundColor = '#ccc'; // Standard grau
+                    let backgroundColor = '#ccc';
                     if (isDeleteGroupSeat) {
-                      backgroundColor = '#ffffff'; // Weiß für Lösch-Gruppe
+                      backgroundColor = '#ffffff';
                     } else if (isColorGroupSeat) {
-                      backgroundColor = groupForSeat.color; // Gruppenfarbe für Farb-Gruppen
+                      backgroundColor = groupForSeat.color;
                     }
                     
-                    // Bestimme die Randfarbe
-                    let borderColor = '#000'; // Standard schwarz
+                    let borderColor = '#000';
                     if (isDeleteGroupSeat) {
-                      borderColor = '#ccc'; // Hellgrauer Rand für Lösch-Gruppe
+                      borderColor = '#ccc';
                     } else if (isColorGroupSeat) {
-                      borderColor = darkenColor(groupForSeat.color); // Abgedunkelte Gruppenfarbe
+                      borderColor = darkenColor(groupForSeat.color);
                     }
                     
                     return (
@@ -397,7 +546,6 @@ function App() {
                           height: rowSeatSize,
                           fontSize: rowSeatSize / 2.5,
                           fontWeight: '500',
-                          // Spezielle Styling für Löschen-Gruppe
                           color: isDeleteGroupSeat ? '#ffffff' : '#000',
                           opacity: isDeleteGroupSeat && !isDeleteGroupSelected ? 0 : 1,
                           cursor: isDeleteGroupSelected ? 'pointer' : 'default',
@@ -406,7 +554,6 @@ function App() {
                       >
                         {(() => {
                           if (isDeleteGroupSeat) {
-                            // Für Löschen-Gruppe: Leerer Text im Normalzustand
                             return isDeleteGroupSelected ? "X" : "";
                           }
                           return groupForSeat ? groupForSeat.name.substring(0, 3) : seatIndex + 1;
@@ -431,11 +578,10 @@ function App() {
                       <td key={index}>{index + 1}</td>
                     ))}
                   </tr>
-
                   <tr style={{ fontWeight: 'bold' }}>
                     <td>Anzahl Stühle:</td>
                     {activeSeatsPerRow.map((active, index) => (
-                      <td key={index} >{active}</td>
+                      <td key={index}>{active}</td>
                     ))}
                   </tr>
                 </tbody>
@@ -445,14 +591,8 @@ function App() {
               <h4>Gruppen:</h4>
               {deleteGroupObj && (
                 <div className="legend-group">
-                  <div 
-                    className="color-box" 
-                    style={{ 
-                      backgroundColor: '#ffffff',
-                      border: '1px solid #ccc'
-                    }}
-                  ></div>
-                  <span style={{ fontStyle: 'italic' }}>Löschen</span>
+                  <div className="color-box" style={{ backgroundColor: '#ffffff', border: '1px solid #ccc' }}></div>
+                  <span style={{ fontStyle: 'italic' }}>Ausblenden</span>
                   <span style={{ marginLeft: '10px', color: '#666', fontSize: '0.9em' }}>
                     ({deleteGroupObj.seats.size} Sitze)
                   </span>
@@ -462,13 +602,7 @@ function App() {
                 const originalIndex = groups.findIndex(g => g === group);
                 return (
                   <div key={originalIndex} className="legend-group">
-                    <div 
-                      className="color-box" 
-                      style={{ 
-                        backgroundColor: group.color,
-                        border: 'none'
-                      }}
-                    ></div>
+                    <div className="color-box" style={{ backgroundColor: group.color, border: 'none' }}></div>
                     <span>{group.name}</span>
                     <span style={{ marginLeft: '10px', color: '#666', fontSize: '0.9em' }}>
                       ({group.seats.size} Sitze)
