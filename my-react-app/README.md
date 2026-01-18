@@ -1,21 +1,22 @@
-Orchester Sitzplan Generator
-Eine React-App zur Erstellung und Verwaltung von Orchestersitzplänen mit visueller Gruppenverwaltung und PDF-Export-Funktionalität.
+# 🎵 Orchester Sitzplan Generator
 
-🎵 Funktionen
-Dynamischer Sitzplan-Editor: Halbkreisförmige Anordnung mit 1-5 Reihen und bis zu 30 Sitzen pro Reihe
+Eine React-Anwendung zur Erstellung und Verwaltung von Orchestersitzplänen mit visueller Gruppenverwaltung und PDF-Export-Funktionalität.
 
-Gruppenverwaltung: Erstelle farbcodierte Gruppen für verschiedene Instrumentengruppen
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![React](https://img.shields.io/badge/React-18.2.0-61dafb.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-Ausblend-Funktion: Markiere nicht benötigte Sitze als ausgeblendet
+## ✨ Funktionen
 
-PDF-Export: Generiere druckfertige PDFs mit Legende und Übersicht
+- **Dynamischer Sitzplan-Editor**: Halbkreisförmige Anordnung mit 1-5 Reihen und bis zu 30 Sitzen pro Reihe
+- **Gruppenverwaltung**: Erstelle farbcodierte Gruppen für verschiedene Instrumentengruppen
+- **Ausblend-Funktion**: Markiere nicht benötigte Sitze als ausgeblendet
+- **PDF-Export**: Generiere druckfertige PDFs mit Legende und Übersicht
+- **Intuitive Bedienung**: Einfache Sitzplatz-Zuweisung per Klick
+- **30 vordefinierte Farben**: Automatische Farbvorschläge ohne Doppelungen
 
-Intuitive Bedienung: Einfache Sitzplatz-Zuweisung per Klick
-
-30 vordefinierte Farben: Automatische Farbvorschläge ohne Doppelungen
-
-🚀 Installation
-bash
+## 🚀 Installation
+```bash
 # Repository klonen
 git clone <repository-url>
 cd orchester-sitzplan
@@ -25,38 +26,41 @@ npm install
 
 # Entwicklungsserver starten
 npm run dev
-📖 Bedienung
-Grundkonfiguration
-Wähle die Anzahl der Reihen (1-5)
+```
 
-Konfiguriere die Sitzanzahl pro Reihe (1-30)
+## 📖 Bedienung
 
-Gruppen erstellen
-Gib einen Gruppennamen ein (z.B. "Violinen", "Blechbläser")
+### Grundkonfiguration
 
-Wähle eine Farbe oder behalte den Vorschlag
+1. Wähle die Anzahl der Reihen (1-5)
+2. Konfiguriere die Sitzanzahl pro Reihe (1-30)
 
-Klicke auf "+" oder drücke Enter
+### Gruppen erstellen
 
-Sitzplätze zuweisen
-Wähle eine Gruppe durch Klick auf das Stift-Icon
+1. Gib einen Gruppennamen ein (z.B. "Violinen", "Blechbläser")
+2. Wähle eine Farbe oder behalte den Vorschlag
+3. Klicke auf "+" oder drücke Enter
 
-Klicke auf die gewünschten Sitzplätze im halbkreisförmigen Layout
+### Sitzplätze zuweisen
 
-Wechsle die Gruppe, um andere Plätze zuzuweisen
+1. Wähle eine Gruppe durch Klick auf das Stift-Icon
+2. Klicke auf die gewünschten Sitzplätze im halbkreisförmigen Layout
+3. Wechsle die Gruppe, um andere Plätze zuzuweisen
 
-PDF exportieren
+### PDF exportieren
+
 Klicke auf den "PDF Export" Button, um den Sitzplan als druckfertiges PDF zu speichern.
 
-📦 Abhängigkeiten
-React (^18.2.0) - UI Framework
+## 📦 Technologie-Stack
 
-jsPDF (^2.5.1) - PDF-Generierung
+| Technologie | Version | Zweck |
+|------------|---------|-------|
+| React | ^18.2.0 | UI Framework |
+| jsPDF | ^2.5.1 | PDF-Generierung |
+| Vite | - | Build Tool und Development Server |
 
-Vite - Build Tool und Development Server
-
-🛠️ Entwicklung
-bash
+## 🛠️ Entwicklung
+```bash
 # Entwicklungsserver starten
 npm run dev
 
@@ -68,30 +72,47 @@ npm run preview
 
 # ESLint ausführen
 npm run lint
-🎨 Projektstruktur
-text
+```
+
+## 🎨 Projektstruktur
+```
 src/
 ├── App.jsx              # Hauptkomponente
 ├── App.css             # Styling
 ├── main.jsx            # App-Einstiegspunkt
 └── index.css           # Globale Styles
-📄 PDF-Export Details
+```
+
+## 📄 PDF-Export Details
+
 Das generierte PDF enthält:
 
-Vektorbasierte Sitzplandarstellung
+- ✅ Vektorbasierte Sitzplandarstellung
+- ✅ Farbcodierte Gruppen
+- ✅ Übersichtstabelle der Reihen
+- ✅ Dirigentenplatz (markiert mit "D")
+- ✅ Vollständige Legende
+- ✅ Optimiert für A4 Querformat
 
-Farbcodierte Gruppen
+## 🤝 Beitragen
 
-Übersichtstabelle der Reihen
-
-Dirigentenplatz (markiert mit "D")
-
-Vollständige Legende
-
-Optimiert für A4 Querformat
-
-🤝 Beitragen
 Beiträge sind willkommen! Bitte erstelle einen Fork des Repositories und reiche einen Pull Request mit deinen Änderungen ein.
 
-📝 Lizenz
-MIT
+1. Fork das Projekt
+2. Erstelle einen Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit deine Änderungen (`git commit -m 'Add some AmazingFeature'`)
+4. Push zum Branch (`git push origin feature/AmazingFeature`)
+5. Öffne einen Pull Request
+
+## 📝 Lizenz
+
+Dieses Projekt ist unter der MIT-Lizenz lizenziert.
+
+## 👤 Autor
+
+Dein Name - [@deinhandle](https://twitter.com/deinhandle)
+
+## 🙏 Danksagungen
+
+- Inspiriert von klassischen Orchesterlayouts
+- Icons und UI-Design mit moderner Web-Technologie
