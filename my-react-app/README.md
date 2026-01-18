@@ -94,25 +94,11 @@ Das generierte PDF enthält:
 - ✅ Vollständige Legende
 - ✅ Optimiert für A4 Querformat
 
-## 🤝 Beitragen
-
-Beiträge sind willkommen! Bitte erstelle einen Fork des Repositories und reiche einen Pull Request mit deinen Änderungen ein.
-
-1. Fork das Projekt
-2. Erstelle einen Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit deine Änderungen (`git commit -m 'Add some AmazingFeature'`)
-4. Push zum Branch (`git push origin feature/AmazingFeature`)
-5. Öffne einen Pull Request
-
 ## 📝 Lizenz
 
 Dieses Projekt ist unter der MIT-Lizenz lizenziert.
 
 ## 👤 Autor
 
-Dein Name - [@deinhandle](https://twitter.com/deinhandle)
+Dein Name - [@mhausl]
 
-## 🙏 Danksagungen
-
-- Inspiriert von klassischen Orchesterlayouts
-- Icons und UI-Design mit moderner Web-Technologie
