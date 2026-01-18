@@ -6,6 +6,10 @@ Eine React-Anwendung zur Erstellung und Verwaltung von Orchestersitzplänen mit 
 ![React](https://img.shields.io/badge/React-18.2.0-61dafb.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
+## Live-Demo
+
+![App in Aktion](./my-react-app/src/assets/example.jpg)
+
 ## ✨ Funktionen
 
 - **Dynamischer Sitzplan-Editor**: Halbkreisförmige Anordnung mit 1-5 Reihen und bis zu 30 Sitzen pro Reihe
@@ -101,4 +105,3 @@ Dieses Projekt ist unter der MIT-Lizenz lizenziert.
 ## 👤 Autor
 
 Dein Name - [@mhausl]
-
