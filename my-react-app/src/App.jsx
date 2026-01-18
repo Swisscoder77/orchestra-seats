@@ -297,7 +297,7 @@ const exportToPDF = () => {
     // Aktive Stühle Zeile
     pdf.setFontSize(10);
     pdf.setTextColor(100, 100, 100);
-    pdf.text('Aktive', legendX, legendY);
+    pdf.text('Anz. Stühle', legendX, legendY);
     activeSeats.forEach((seats, i) => {
       pdf.text(seats.toString(), legendX + 20 + i * tableColWidth, legendY);
     });
@@ -613,7 +613,7 @@ const exportToPDF = () => {
                     ))}
                   </tr>
                   <tr style={{ fontWeight: 'bold' }}>
-                    <td>Anzahl Stühle:</td>
+                    <td>Anz. Stühle:</td>
                     {activeSeatsPerRow.map((active, index) => (
                       <td key={index}>{active}</td>
                     ))}
