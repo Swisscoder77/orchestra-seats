@@ -8,7 +8,7 @@ Eine React-Anwendung zur Erstellung und Verwaltung von Orchestersitzplänen mit 
 
 ## Live-Demo
 
-![App in Aktion](./src/assets/example.jpg)
+![App in Aktion](./my-react-app/src/assets/example.jpg)
 
 ## ✨ Funktionen
 
